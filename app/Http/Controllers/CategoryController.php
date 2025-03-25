@@ -48,4 +48,19 @@ class CategoryController extends Controller
         return response()->json($categories);
     }
 
+    public function update(Request $request)
+{
+    $category = Category::find($request->id);
+    
+    if (!$category) {
+        return response()->json(['message' => 'Category not found'], 404);
+    }
+
+    $category->status = $request->status;
+    $category->save();
+
+    return response()->json(['message' => 'Status updated successfully']);
+}
+
+
 }

@@ -28,12 +28,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/update', [ProductController::class, 'update']);
     Route::delete('/destroy', [ProductController::class, 'destroy']);
 
-    
-    Route::get('/ProductListing', [ProductController::class, 'ProductListing']);
     Route::get('/category', [CategoryController::class, 'category']);
     Route::get('/getCategory', [CategoryController::class, 'getCategory'])->name('getCategory');
     Route::get('/index', [CategoryController::class, 'index'])->name('index');
     Route::post('/category', [CategoryController::class, 'store']);
+    Route::put('/update', [CategoryController::class, 'update']);
 
     Route::get('/order', [OrderController::class, 'order']);
     Route::get('/product-listing', [ProductListingController::class, 'ProductListing'])->name('product.listing');

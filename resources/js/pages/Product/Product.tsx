@@ -18,89 +18,88 @@ const breadcrumbs: BreadcrumbItem[] = [{
 
 export default function Product() {
 
-  const [imageFile, setImageFile] = useState<File | null>(null);
-    const [images, setImages] = useState<string[]>([]); 
-    const [categorys, setCategorys] = useState<{ id: number; name: string }[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [images, setImages] = useState<string[]>([]); 
+  const [categorys, setCategorys] = useState<{ id: number; name: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const fetchCategories = async () => {
+    try {
+        const response = await axios.get("/getCategory");
+        console.log("Fetched categories:", response.data); 
 
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get("/getCategory");
-            console.log("Fetched categories:", response.data); 
+        setCategorys(response.data);
+        
+        // if (Array.isArray(response.data)) {  
+        //     setCategorys(response.data);
+        //     if (response.data.length > 0) setSelectedCategory(response.data[0].id);
+        // } else {
+        //     console.error("Invalid category response:", response.data);
+        // }
+    } catch (error) {
+        console.error("Error fetching categories:", error);
+    }
+  };
 
-            setCategorys(response.data);
-            
-            // if (Array.isArray(response.data)) {  
-            //     setCategorys(response.data);
-            //     if (response.data.length > 0) setSelectedCategory(response.data[0].id);
-            // } else {
-            //     console.error("Invalid category response:", response.data);
-            // }
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        }
-    };
-
-    
   useEffect(() => {
     fetchCategories();
   }, []);
   
-
-    const { data, setData, post, processing, errors, reset } = useForm({
-      name: '',
-      description: '',
-      category_id: '',
-      sku: '',
-      price: '',
-      stock: '',
-      weight: '',
-      width: '',
-      length: '',
-      height: '',
-      fragile: '',
-      status: '',
-      image: '',
+  const { data, setData, post, processing, errors, reset } = useForm({
+    name: '',
+    description: '',
+    category_id: '',
+    sku: '',
+    price: '',
+    stock: '',
+    weight: '',
+    width: '',
+    length: '',
+    height: '',
+    fragile: '',
+    status: '',
+    image: '',
   });
 
-
   const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setImageFile(event.target.files[0]);
+    if (event.target.files) {
+        const selectedFiles = Array.from(event.target.files);
+        if (imageFiles.length + selectedFiles.length > 9) {
+            alert("You can only upload a maximum of 9 images.");
+            return;
+        }
+        setImageFiles((prev) => [...prev, ...selectedFiles]);
     }
+};
+
+  const handleRemoveImage = (index: number) => {
+      setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit: FormEventHandler = async (e) => {
-    e.preventDefault();
-  
-    const formData = new FormData();
+      e.preventDefault();
     
-    // Append form fields  
-    Object.keys(data).forEach((key) => {
-      formData.append(key, data[key as keyof typeof data] as string);
-    });
-  
-    // Append Image  
-    if (imageFile) {
-      formData.append("image", imageFile);
-    }
-  
-    router.post('/store-product', formData, {
-      onSuccess: () => {
-        reset();
-        setImageFile(null);
-        fetchCategories();
-      },
-      onError: (errors) => {
-        console.error("Form submission error:", errors);
-      },
-    });
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+          formData.append(key, data[key as keyof typeof data] as string);
+      });
+
+      imageFiles.forEach((file, index) => {
+          formData.append(`images[${index}]`, file);
+      });
+
+      router.post('/store-product', formData, {
+          onSuccess: () => {
+              reset();
+              setImageFiles([]);
+              fetchCategories();
+          },
+          onError: (errors) => {
+              console.error("Form submission error:", errors);
+          },
+      });
   };
   
-
   // console.log(categorys)
-  
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Product" />
@@ -114,56 +113,56 @@ export default function Product() {
                   </Button>
                 </div>
                 <div className="flex flex-col w-full border border-gray-300 rounded-s-sm p-5">
-
                     <h2 className="text-xl font-bold mb-4 bg-white">Basic Information</h2>
-                            
-                   
                     {/* Product Images */}
-<div className="mb-6">
-  <label className="flex font-medium mb-2 text-gray-700">
-    Product Images <span className="text-red-500">*</span>
-  </label>
-
-  <div
-    className="flex flex-col items-center justify-center border border-dashed border-gray-400 p-6 rounded-lg shadow-sm bg-gray-50 w-full h-40 cursor-pointer"
-    onClick={() => document.getElementById('fileInput')?.click()} // Clickable area
-  >
-    {/* Image Preview */}
-    {imageFile ? (
-      <img
-        src={URL.createObjectURL(imageFile)}
-        alt="Uploaded Preview"
-        className="w-full h-full object-contain rounded-md"
-      />
-    ) : (
-      <label className="flex flex-col items-center cursor-pointer">
-        <svg
-          className="w-10 h-10 text-gray-400 mb-2"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M7 16l4-4 4 4m-4-4v12"></path>
-        </svg>
-        <p className="text-gray-500">Drag your files here or click in this area.</p>
-      </label>
-    )}
-
-    {/* Hidden File Input */}
-    <input
-      id="fileInput"
-      type="file"
-      accept="image/*"
-      className="hidden"
-      onChange={handleUpload}
-    />
-  </div>
-</div>
-
-
-                    <label className="flex flex-col font-medium mb-2">Product Name <span className="text-red-500">*</span></label>
+                    <div className="mb-6">
+                      <label className="flex font-medium mb-2 text-gray-700">
+                        Product Images <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-col items-center justify-center border border-dashed border-gray-400 p-6 rounded-lg shadow-sm bg-gray-50 w-full h-40 cursor-pointer"
+                        onClick={() => document.getElementById('fileInput')?.click()}>
+                        {/* Image Preview */}
+                        {imageFiles.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                              {imageFiles.map((file, index) => (
+                                <div key={index} className="relative w-24 h-24">
+                                  <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover rounded-md" />
+                                  <button
+                                      type="button"
+                                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                                      onClick={() => handleRemoveImage(index)}>
+                                        <X size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                          </div>
+                            ) : (
+                            <label className="flex flex-col items-center cursor-pointer">
+                              <svg
+                                  className="w-10 h-10 text-gray-400 mb-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 16l4-4 4 4m-4-4v12"></path>
+                              </svg>
+                                <p className="text-gray-500">Drag your files here or click in this area.</p>
+                            </label>
+                            )}
+                            <input
+                              id="fileInput"
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              className="hidden"
+                              onChange={handleUpload}
+                            />
+                      </div>
+                        <p className="text-sm text-gray-500 mt-2">You can upload up to 9 images.</p>
+                    </div>
+                    {/* Form */}
+                    <label className="flex font-medium mb-2">Product Name <span className="text-red-500">*</span></label>
                     <input
                         type="text"
                         value={data.name} 
@@ -178,7 +177,6 @@ export default function Product() {
                           className="w-full border px-3 py-2 rounded-md mb-4 h-32 resize-none"
                           placeholder="Enter product description"
                       />
-
                     <label className="flex flex-col font-medium mb-2">Category</label>
                     <select 
                         value={data.category_id || ''} 
@@ -215,7 +213,7 @@ export default function Product() {
                         placeholder="Enter product stock" 
                       />
                 </div>
-
+                  {/* Shipping */}
                 <div className="flex flex-col w-full gap-4 border border-gray-300 rounded-s-sm p-5">
                   <h2 className="text-xl font-bold mb-4 bg-white">Shipping</h2>
                   <div className="flex flex-col gap-4">
@@ -237,7 +235,6 @@ export default function Product() {
                     {/* Parcel Size Section */}
                     <div className="flex items-center gap-2">
                       <label className="text-black font-medium w-24">Parcel Size</label>
-
                       {/* Width */}
                       <div className="flex items-center border rounded-md px-2 py-1">
                         <input
@@ -249,7 +246,6 @@ export default function Product() {
                         />
                           <span className="text-gray-500 px-2">cm</span>
                       </div>
-
                       <span className="text-gray-500">×</span>
                       {/* Length */}
                       <div className="flex items-center border rounded-md px-2 py-1">
@@ -257,29 +253,23 @@ export default function Product() {
                           type="number"
                           value={data.length}
                           onChange={(e) => setData('length', e.target.value)}
-                        
                           placeholder="Enter product length"
                           />
-
                           <span className="text-gray-500 px-2">cm</span>
                       </div>
-
                       <span className="text-gray-500">×</span>
-
                       {/* Height */}
                       <div className="flex items-center border rounded-md px-2 py-1">
                         <input
                           type="number"
                           value={data.height}
-                          onChange={(e) => setData('height', e.target.value)}
-                          
+                          onChange={(e) => setData('height', e.target.value)} 
                           placeholder="Enter product height"
                           />
                           <span className="text-gray-500 px-2">cm</span>
                       </div>
                     </div>
                   </div>
-
                   <div className="flex flex-col gap-2">
                     {/* Fragile Label */}
                     <label className="flex font-medium mb-2">Fragile?</label>
@@ -291,7 +281,6 @@ export default function Product() {
                           <XCircle className={`w-5 h-5 ${data.fragile === "yes" ? "text-white" : "text-red-500"}`} />
                           <span>Yes</span>
                       </label>
-
                       <label className={`flex items-center gap-2 px-5 py-2 rounded-full cursor-pointer border
                           ${data.fragile === "no" ? "bg-green-500 text-white border-green-500" : "bg-white border-gray-300 hover:bg-green-100"}`}>
                           <input type="radio" value="no" checked={data.fragile === "no"}
@@ -306,8 +295,7 @@ export default function Product() {
                   <select 
                         value={data.status} 
                         onChange={(e) => setData('status', e.target.value)} 
-                        className="w-full border px-3 py-2 rounded-md mb-4"
-                    >
+                        className="w-full border px-3 py-2 rounded-md mb-4">
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
                   </select>         

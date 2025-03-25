@@ -4,19 +4,10 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios'; // Ensure axios is imported
 import { Input } from '@/components/ui/input';
-import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"; 
 import { Tag } from "lucide-react";
 
-// Breadcrumbs
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Category',
@@ -24,21 +15,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Type Definition for Category
-interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    parent_id: string | null;
-    level: string;
-    description: string;
-    status: string;
-}
-
 export default function Category() {
     const [visible, setVisible] = useState(false);
     const [categorys, setCategorys] = useState<Category[]>([]);
-    
+    const closeDialog = () => setVisible(false);
     const { data, setData, post, processing, errors, reset } = useForm<Category>({
         name: '',
         slug: '',
@@ -56,35 +36,50 @@ export default function Category() {
         status: string;
         [key: string]: string; 
     };
-    
-    // Fetch Categories
+  
     const fetchCategories = async () => {
         try {
             const response = await axios.get("/index");
-            console.log("Fetched categories:", response.data);
-            setCategorys(response.data);
+            setCategorys(response.data.map((category: Category) => ({
+                ...category,
+                id: Number(category.id),  // Ensure id is a number
+                parent_id: category.parent_id ? String(category.parent_id) : null, // Convert to string if necessary
+            })));
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
     };
-
+    
     useEffect(() => {
         fetchCategories();
     }, []);
 
-    // Count occurrences of each category name
     const categoryCounts = categorys.reduce((acc, category) => {
         acc[category.name] = (acc[category.name] || 0) + 1;
         return acc;
     }, {} as Record<string, number>);
 
-    // Convert to an array of objects
     const uniqueCategories = Object.keys(categoryCounts).map(name => ({
         name,
         count: categoryCounts[name]
     }));
 
-    // Color gradients for category cards
+    const toggleStatus = async (id: number, currentStatus: string) => {
+    const newStatus = currentStatus === "active" ? "inactive" : "active";
+        try {
+            await axios.put(`/update`, { id, status: newStatus });
+    
+            setCategorys((prevCategories) =>
+                prevCategories.map((category) =>
+                    Number(category.id) === id ? { ...category, status: newStatus } : category
+                )
+            );
+            console.log(`Updated category ${id} to ${newStatus}`);
+        } catch (error) {
+            console.error("Error updating status:", error);
+        }
+    };
+
     const gradientColors = [
         "from-orange-400 to-orange-200",
         "from-blue-500 to-blue-300",
@@ -93,10 +88,6 @@ export default function Category() {
         "from-purple-500 to-purple-300"
     ];
 
-    // Close Dialog
-    const closeDialog = () => setVisible(false);
-
-    // Handle Submit
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/category', {
@@ -119,14 +110,12 @@ export default function Category() {
                         <div 
                             key={index} 
                             className={`p-6 rounded-xl shadow-md bg-gradient-to-r ${gradientColors[index % gradientColors.length]} 
-                                text-white flex items-center gap-4 transition-transform transform hover:scale-105`}
-                        >
+                                text-white flex items-center gap-4 transition-transform transform hover:scale-105`} >
                             <div className="bg-white bg-opacity-20 p-3 rounded-full">
                                 <Tag size={30} className="text-white" />
                             </div>
                             <div>
                                 <p className="text-xl font-semibold">{category.name}</p>
-                                
                             </div>
                         </div>
                     ))}
@@ -145,8 +134,7 @@ export default function Category() {
                             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-900 to-gray-600 
                                     text-white text-sm font-semibold shadow-md transition-all hover:from-blue-600 hover:to-blue-500 
                                     active:scale-95"
-                            onClick={() => setVisible(true)}
-                        >
+                            onClick={() => setVisible(true)}>
                             Create
                         </button>
                     </div>
@@ -167,18 +155,27 @@ export default function Category() {
                             </TableHeader>
                             <TableBody>
                                 {categorys.length > 0 ? (
-                                    categorys.map((category, index) => (
-                                        <TableRow key={category.id} className="bg-white">
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell>{category.name}</TableCell>
-                                            <TableCell>{category.slug}</TableCell>
-                                            <TableCell>{category.parent_id || "None"}</TableCell>
-                                            <TableCell>{category.level}</TableCell>
-                                            <TableCell>{category.description || "N/A"}</TableCell>
-                                            <TableCell className={category.status === "active" ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                                                {category.status}
-                                            </TableCell>
-                                        </TableRow>
+                                categorys.map((category, index) => (
+                                <TableRow key={category.id} className="bg-white">
+                                    <TableCell>{index + 1}</TableCell>
+                                    <TableCell>{category.name}</TableCell>
+                                    <TableCell>{category.slug}</TableCell>
+                                    <TableCell>{category.parent_id || "None"}</TableCell>
+                                    <TableCell>{category.level}</TableCell>
+                                    <TableCell>{category.description || "N/A"}</TableCell>
+                                    <TableCell>
+                                        <div className={`relative w-12 h-6 flex items-center rounded-full p-1 transition-all duration-300 ease-in-out cursor-pointer ${
+                                            category.status === "active" ? "bg-[#00bcd4]" : "bg-gray-300"
+                                            }`}
+                                            onClick={() => toggleStatus(Number(category.id), category.status)} >
+                                            <div
+                                                className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-all duration-300 ease-in-out ${
+                                                    category.status === "active" ? "translate-x-6" : "translate-x-0"
+                                                }`}>
+                                            </div>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
@@ -204,12 +201,10 @@ export default function Category() {
                                         <Input
                                             id={key}
                                             name={key}
-                                         
                                             onChange={(e) => setData((prev) => ({
                                                 ...prev,
                                                 [key]: e.target.value
                                             }))}
-                                            
                                             type="text"
                                             placeholder={`Enter ${key}`}
                                         />
@@ -217,7 +212,6 @@ export default function Category() {
                                     </div>
                                 ))}
                             </div>
-
                             <div className="flex justify-end gap-2 py-3">
                                 <button type="button" onClick={closeDialog} className="px-4 py-2 text-gray-600 bg-gray-200 rounded-md">Cancel</button>
                                 <button type="submit" className="px-4 py-2 text-white bg-blue-600 rounded-md" disabled={processing}>

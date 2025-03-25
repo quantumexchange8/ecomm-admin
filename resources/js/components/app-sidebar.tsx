@@ -4,9 +4,9 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { ChartColumnStacked, LayoutGrid, ShoppingBag, ShoppingCart, ShoppingBasket } from 'lucide-react';
 import AppLogo from './app-logo';
-
+import { MdProductionQuantityLimits } from "react-icons/md";
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -16,22 +16,22 @@ const mainNavItems: NavItem[] = [
     {
       title: 'Product',
       url: 'product',
-      icon: LayoutGrid,
+      icon: ShoppingBag,
   },
   {
     title: 'Product Listing',
     url: 'product-listing',
-    icon: LayoutGrid,
+    icon: ShoppingCart,
 },
   {
     title: 'Category',
     url: '/category',
-    icon: LayoutGrid,
+    icon: ChartColumnStacked,
 },
 {
   title: 'Order',
   url: '/order',
-  icon: LayoutGrid,
+  icon: ShoppingBasket ,
 },
 ];
 
