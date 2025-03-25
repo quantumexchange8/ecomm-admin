@@ -50,16 +50,20 @@ const ProductListing = () => {
     setFilteredProducts(filtered);
   }, [searchTerm, products]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      router.delete(`/product/${id}`, {
+      router.delete(`/deleteProduct/${id}`, {
         onSuccess: () => {
           setFilteredProducts(filteredProducts.filter(product => product.id !== id));
+        },
+        onError: (errors) => {
+          console.error("Error deleting product:", errors);
+          alert("Failed to delete product. Please try again.");
         }
       });
     }
   };
-
+  
   const columns: ColumnDef<Product>[] = [
     { accessorKey: "name", header: "Product Name" },
     { accessorKey: "sku", header: "SKU" },
@@ -81,7 +85,7 @@ const ProductListing = () => {
     {
       header: "Actions",
       cell: ({ row }) => (
-        <Button className="bg-red-500 text-white p-2" onClick={() => handleDelete(row.original.id)}>
+        <Button className="bg-gray-700 text-white p-2 cursor-pointer" onClick={() => handleDelete(row.original.id)}>
           Delete
         </Button>
       ),
@@ -96,7 +100,7 @@ const ProductListing = () => {
     getSortedRowModel: getSortedRowModel(),
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize: 6,
       },
     },
   });
@@ -111,7 +115,7 @@ const ProductListing = () => {
             <span className="flex font-normal text-gray-500 text-xs">Manage your products</span>
           </div>
           <Button 
-            className="bg-orange-400 p-5" 
+            className="bg-orange-400 p-5 cursor-pointer" 
             onClick={() => router.visit("/product")}
           >
             Add Product 
@@ -133,6 +137,7 @@ const ProductListing = () => {
           
           </form>
         </div>
+        <div className="w-full overflow-x-auto mt-6">
         <Table>
           <TableHeader className="bg-gray-100">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -148,7 +153,7 @@ const ProductListing = () => {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-gray-50 transition-all">
+                <TableRow key={row.id}  className="border-b border-gray-200">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="px-4 py-3 border-b">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -165,15 +170,16 @@ const ProductListing = () => {
             )}
           </TableBody>
         </Table>
+        </div>
        {/* Pagination Controls */}
        <div className="flex justify-between items-center p-4">
-            <Button disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
+            <Button className="cursor-pointer" disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()}>
               Previous
             </Button>
             <span>
               Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
             </span>
-            <Button disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
+            <Button className="cursor-pointer" disabled={!table.getCanNextPage()} onClick={() => table.nextPage()}>
               Next
             </Button>
           </div>

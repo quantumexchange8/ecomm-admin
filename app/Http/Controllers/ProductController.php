@@ -21,7 +21,6 @@ class ProductController extends Controller
     $request->validate([
         'name' => 'required|string|max:255',
         'sku' => 'required|string',
-        'description' => 'nullable|string',
         'price' => 'required|numeric|min:0',
         'stock' => 'required|integer|min:0',
         'category_id' => 'required|exists:categorys,id', // Fixed table name
@@ -47,12 +46,15 @@ class ProductController extends Controller
         'length' => $request->length,
         'height' => $request->height,
         'fragile' => $request->fragile,
-        'status' => $request->status,
+        'status' => 'Active',
     ]);
 
     // Handle image upload using Spatie Media Library
-    if ($request->hasFile('image')) {
-        $product->addMedia($request->file('image'))->toMediaCollection('product_images');
+    foreach($request->images as $image){
+        if ($image) {
+            $product->addMedia($image)->toMediaCollection('product_images');
+    }
+    
     }
 
     return redirect()->back()->with('success', 'Product created successfully.');
@@ -77,6 +79,21 @@ class ProductController extends Controller
         return response()->json($products);
 
     }
+
+    public function deleteProduct($id)
+    {
+        $product = Product::find($id);
+    
+        if (!$product) {
+            return back()->withErrors(['message' => 'Product not found']);
+        }
+    
+        $product->delete();
+    
+        return back()->with('success', 'Product deleted successfully');
+    }
+    
+
     // public function show($id)
     // {
     //     $product = Product::with('categorys')->findOrFail($id);

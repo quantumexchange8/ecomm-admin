@@ -56,7 +56,7 @@ export default function Product() {
     length: '',
     height: '',
     fragile: '',
-    status: '',
+    status: 'Active',
     image: '',
   });
 
@@ -106,7 +106,7 @@ export default function Product() {
             <div className='flex flex-col w-full items-center gap-4 p-10'>
                 <div className="flex w-full justify-end">
                   <Button
-                    className="bg-orange-400 p-5" 
+                    className="bg-orange-400 p-5 cursor-pointer" 
                     onClick={() => router.visit("/product-listing")}
                   >
                     Back to Product
@@ -177,11 +177,21 @@ export default function Product() {
                           className="w-full border px-3 py-2 rounded-md mb-4 h-32 resize-none"
                           placeholder="Enter product description"
                       />
-                    <label className="flex flex-col font-medium mb-2">Category</label>
+
+                      <div className="flex w-full justify-between mb-4">
+                        <label className="flex flex-co items-center font-medium">Category</label>
+                   
+                        <Button
+                          className="bg-orange-400 p-5 justify-end gap-2 cursor-pointer" 
+                          onClick={() => router.visit("/category")}
+                        >
+                        Add Category
+                        </Button>
+                      </div>
                     <select 
                         value={data.category_id || ''} 
                         onChange={(e) => setData('category_id', e.target.value)} 
-                        className="w-full border px-3 py-2 rounded-md mb-4"
+                        className="w-full border px-3 py-2 rounded-md"
                       >
                         <option value="" disabled>Select a category</option>
                         {categorys.length > 0 ? categorys.map(category => (

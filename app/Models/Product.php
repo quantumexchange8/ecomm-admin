@@ -9,7 +9,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Product extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
-
     // Mass assignable fields
     protected $table = 'products'; 
     protected $fillable = [
@@ -27,4 +26,8 @@ class Product extends Model implements HasMedia
         'status',
        
     ];
+    // public function category()
+    // {
+    //     return $this->belongsTo(Category::class);
+    // }
 }
