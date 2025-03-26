@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MainController as ControllersMainController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductListingController;
@@ -25,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/store-product', [ProductController::class, 'storeProduct'])->name('store-product');
     Route::delete('/deleteProduct/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('/show', [ProductController::class, 'show']);
-    Route::put('/update', [ProductController::class, 'update']);
+    Route::put('/update/{id}', [ProductController::class, 'update']);
     Route::delete('/destroy', [ProductController::class, 'destroy']);
 
     Route::get('/category', [CategoryController::class, 'category']);
@@ -36,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/order', [OrderController::class, 'order']);
     Route::get('/product-listing', [ProductListingController::class, 'ProductListing'])->name('product.listing');
+
+    Route::get('/member', [MemberController::class, 'member']);
 });
 
 require __DIR__.'/settings.php';

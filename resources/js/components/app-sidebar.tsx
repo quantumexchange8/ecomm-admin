@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ChartColumnStacked, LayoutGrid, ShoppingBag, ShoppingCart, ShoppingBasket } from 'lucide-react';
+import { ChartColumnStacked, LayoutGrid, ShoppingBag, ShoppingCart, ShoppingBasket, UserRound  } from 'lucide-react';
 import AppLogo from './app-logo';
 import { MdProductionQuantityLimits } from "react-icons/md";
 const mainNavItems: NavItem[] = [
@@ -33,6 +33,11 @@ const mainNavItems: NavItem[] = [
   url: '/order',
   icon: ShoppingBasket ,
 },
+{
+    title: 'Member Listing',
+    url: '/member',
+    icon: UserRound ,
+  },
 ];
 
 // const footerNavItems: NavItem[] = [

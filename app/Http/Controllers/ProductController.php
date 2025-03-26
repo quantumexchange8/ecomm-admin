@@ -67,6 +67,28 @@ class ProductController extends Controller
         return response()->json($categorys);
     }
 
+    public function update(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+    
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:50',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'fragile' => 'required|string|in:yes,no',
+            'weight' => 'required|numeric|min:0',
+            'width' => 'required|numeric|min:0',
+            'length' => 'required|numeric|min:0',
+            'height' => 'required|numeric|min:0',
+        ]);
+    
+        $product->update($validatedData);
+    
+        return redirect()->back()->with('success', 'Product updated successfully');
+    }
+    
     // public function index()
     // {
     //     $products = Product::with('categorys')->latest()->get();
