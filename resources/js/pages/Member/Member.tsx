@@ -23,7 +23,7 @@ const Member = () => {
   const [filteredUsers, setFilteredUsers] = useState(users);
 
   useEffect(() => {
-    let filtered = users.filter(user => user.role !== "admin"); // ✅ Exclude Admins
+    let filtered = users.filter(user => user.role !== "admin"); 
     if (searchTerm.trim()) {
       filtered = filtered.filter(
         (user) =>

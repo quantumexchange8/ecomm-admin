@@ -10,10 +10,10 @@ class MemberController extends Controller
 {
     public function member()
     {
-        $users = User::all(); // Retrieve all users
+        $users = User::all();
 
         return Inertia::render('Member/Member', [
-            'users' => $users, // Pass members to Inertia
+            'users' => $users, 
         ]);
     }
     

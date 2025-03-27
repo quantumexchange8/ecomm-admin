@@ -13,6 +13,11 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Member Listing',
+        url: '/member',
+        icon: UserRound ,
+      },
+    {
       title: 'Product',
       url: 'product',
       icon: ShoppingBag,
@@ -22,6 +27,11 @@ const mainNavItems: NavItem[] = [
     url: 'product-listing',
     icon: ShoppingCart,
 },
+{
+title: ' Product Edit',
+    url: '/edit',
+    icon: UserRound ,
+  },
   {
     title: 'Category',
     url: '/category',
@@ -32,11 +42,7 @@ const mainNavItems: NavItem[] = [
   url: '/order',
   icon: ShoppingBasket ,
 },
-{
-    title: 'Member Listing',
-    url: '/member',
-    icon: UserRound ,
-  },
+
 ];
 
 

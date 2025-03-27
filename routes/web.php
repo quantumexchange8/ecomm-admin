@@ -5,6 +5,7 @@ use App\Http\Controllers\MainController as ControllersMainController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductEditController;
 use App\Http\Controllers\ProductListingController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,8 +27,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/store-product', [ProductController::class, 'storeProduct'])->name('store-product');
     Route::delete('/deleteProduct/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('/show', [ProductController::class, 'show']);
-    Route::put('/update/{id}', [ProductController::class, 'update']);
     Route::delete('/destroy', [ProductController::class, 'destroy']);
+
+    Route::get('/edit', [ProductController::class, 'edit']);
 
     Route::get('/category', [CategoryController::class, 'category']);
     Route::get('/getCategory', [CategoryController::class, 'getCategory'])->name('getCategory');

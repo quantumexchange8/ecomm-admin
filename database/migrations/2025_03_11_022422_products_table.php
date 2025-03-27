@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('height');
             $table->string('fragile'); //yes,no
             $table->string('status'); //active or inactice
+            $table->softDeletes();
             $table->timestamps();
         });
     
