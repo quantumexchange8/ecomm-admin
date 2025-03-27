@@ -3,10 +3,9 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { ChartColumnStacked, LayoutGrid, ShoppingBag, ShoppingCart, ShoppingBasket, UserRound  } from 'lucide-react';
 import AppLogo from './app-logo';
-import { MdProductionQuantityLimits } from "react-icons/md";
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
@@ -40,20 +39,14 @@ const mainNavItems: NavItem[] = [
   },
 ];
 
-// const footerNavItems: NavItem[] = [
-//     {
-//         title: 'Repository',
-//         url: 'https://github.com/laravel/react-starter-kit',
-//         icon: Folder,
-//     },
-//     {
-//         title: 'Documentation',
-//         url: 'https://laravel.com/docs/starter-kits',
-//         icon: BookOpen,
-//     },
-// ];
+
 
 export function AppSidebar() {
+    const { post } = useForm();
+
+    const handleLogout = () => {
+        post('/logout'); // Sends a POST request to the logout route
+    };
     return (
         <Sidebar collapsible="icon" variant="inset">
             {/* <SidebarHeader>
@@ -73,10 +66,21 @@ export function AppSidebar() {
                 <NavMain items={mainNavItems} />
             </SidebarContent>
 
-            {/* <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+            {/* <SidebarFooter className="border-t border-gray-200 p-4">
+                <button 
+                    onClick={handleLogout} 
+                    className="flex items-center gap-2 w-full text-red-600 hover:text-red-800 transition"
+                >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                </button>
                 <NavUser />
             </SidebarFooter> */}
+
+            <SidebarFooter>
+               
+                <NavUser />
+            </SidebarFooter>
         </Sidebar>
     );
 }
