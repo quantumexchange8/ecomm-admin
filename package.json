@@ -52,7 +52,7 @@
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",
         "primeicons": "^7.0.0",
-        "primereact": "^10.9.3",
+        "primereact": "^10.9.4",
         "react": "^19.0.0",
         "react-color": "^2.19.3",
         "react-dom": "^19.0.0",

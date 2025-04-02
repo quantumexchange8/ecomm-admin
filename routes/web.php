@@ -24,12 +24,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/categorys', [ProductController::class, 'getCategories']);
     Route::get('/getCategory', [ProductController::class, 'getCategory'])->name('getCategory');
     Route::get('/index', [ProductController::class, 'index'])->name('index');
-    Route::post('/store-product', [ProductController::class, 'storeProduct'])->name('store-product');
+
     Route::delete('/deleteProduct/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('/show', [ProductController::class, 'show']);
     Route::delete('/destroy', [ProductController::class, 'destroy']);
+    Route::get('/edit/{id}', [ProductController::class, 'edit'])->name('edit');
+    // Route::post('/update/{id}', [ProductController::class, 'update'])->name('update');
+    // Route::put('/updateProduct/{id}', [ProductController::class, 'update']);
+    
+   // In web.php (routes)
+// Show the edit form (GET request)
+Route::get('/product/edit/{id}', [ProductEditController::class, 'edit'])->name('product.edit');
 
-    Route::get('/edit', [ProductController::class, 'edit']);
+// Update the product (PUT request)
+Route::put('/product/update/{id}', [ProductEditController::class, 'update'])->name('product.update');
 
     Route::get('/category', [CategoryController::class, 'category']);
     Route::get('/getCategory', [CategoryController::class, 'getCategory'])->name('getCategory');

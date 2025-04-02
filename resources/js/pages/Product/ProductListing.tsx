@@ -133,6 +133,9 @@ const ProductListing = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
+                          <DropdownMenuItem onClick={() => router.visit(`/product/edit/${product.id}`)}>
+                              Edit
+                          </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(product.id)} className="text-red-500">
                               Delete
                             </DropdownMenuItem>

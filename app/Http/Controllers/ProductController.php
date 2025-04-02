@@ -65,40 +65,45 @@ class ProductController extends Controller
         return response()->json($categorys);
     }
 
-    public function edit()
+    public function edit($id)
     {
-        return Inertia::render('Product/ProductEdit');
-    }
-
-    public function update(Request $request)
-    {
-
-        // dd($request->all());
-        $product = Product::find($request->id);
-        $product->update([
-            'name' => $request->name,
-            'sku' => $request->sku,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'category_id' => $request->category_id,
-            'weight' => $request->weight,
-            'width' => $request->width,
-            'length' => $request->length,
-            'height' => $request->height,
-            'fragile' => $request->fragile,
-
-        ]);
-       
-        // if ($request->hasFile('image')) {
-        //     $product->clearMediaCollection('product_images'); 
-        //     $product->addMedia($request->file('image'))->toMediaCollection('product_images');
-        // }
+        $product = Product::find($id);
+      
+        
+        $categorys = Category::all();
     
-        // $updatedProduct = Product::with('category')->findOrFail($id);
-
-        return redirect()->back()->with('success', 'Product updated successfully');
+        return Inertia::render('Product/ProductEdit', [
+            'product' => $product,
+            'categorys' => $categorys
+        ]);
     }
+    
+    
+
+    public function update(Request $request, $id)
+    {
+        $product = Product::find($id);
+    
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string|max:50',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+    
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products');
+            $validatedData['image'] = $imagePath;
+        }
+    
+        $product->update($validatedData);
+    
+        return response()->json(['message' => 'Product updated successfully']);
+    }
+    
     
     // public function update(Request $request, $id)
     // {
