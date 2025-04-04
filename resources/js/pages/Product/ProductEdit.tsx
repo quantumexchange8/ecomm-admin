@@ -1,31 +1,66 @@
-import React from 'react';
-import { useForm, router } from '@inertiajs/react'; // ✅ Import `router`
+import { useForm, router, Head } from '@inertiajs/react'; 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import React, { FormEventHandler, useEffect, useState } from 'react';
+import AppLayout from '@/layouts/app-layout';
+import { X, Plus, XCircle, CheckCircle } from "lucide-react";
+import axios, { AxiosError } from "axios";
+import { BreadcrumbItem } from '@/types';
 
-interface Category {
-    id: number;
-    name: string;
-}
-
+const breadcrumbs: BreadcrumbItem[] = [{
+    title: 'Product',
+    href: '/product',
+}];
 interface Product {
-    id: number;
-    name: string;
-    sku: string;
-    price: number;
-    stock: number;
-    fragile: string;
-    category_id: number;
-    image: string;
-    status: string;
-    description: string;
-    width:number;
-    weight:number;
-    length:number;
-    height:number;
+  id: number;
+  name: string;
+  sku: string;
+  price: number;
+  stock: number;
+  fragile: string;
+  category_id: number;
+  image: string;
+  images?: string[];
+  status: string;
+  description: string;
+  width:number;
+  weight:number;
+  length:number;
+  height:number;
 }
 
-const ProductEdit = ({ product, categorys }: { product: Product, categorys: Category[] }) => {
+export default function ProductEdit({ product }: { product: Product }) {
+
+    console.log('product ', product)
+
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+    const [images, setImages] = useState<string[]>([]);
+    const [categorys, setCategorys] = useState<{ id: number; name: string }[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+   
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get("/getCategory");
+    
+            setCategorys(response.data);
+            
+            // if (Array.isArray(response.data)) {  
+            //     setCategorys(response.data);
+            //     if (response.data.length > 0) setSelectedCategory(response.data[0].id);
+            // } else {
+            //     console.error("Invalid category response:", response.data);
+            // }
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+      };
+    
+      useEffect(() => {
+        fetchCategories();
+      }, []);
+
+
     const { data, setData, put, processing, errors } = useForm({
         name: product.name,
         sku: product.sku,
@@ -33,7 +68,7 @@ const ProductEdit = ({ product, categorys }: { product: Product, categorys: Cate
         stock: product.stock,
         fragile: product.fragile,
         category_id: String(product.category_id), // Ensure it's stored as a string
-        image: null,
+        image: product.image, 
         status: product.status,
         description: product.description,
         width: product.width,
@@ -41,210 +76,267 @@ const ProductEdit = ({ product, categorys }: { product: Product, categorys: Cate
         length: product.length,
         height: product.height,
     });
-    
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        put(route('product.update', product.id), {
-            onSuccess: () => router.visit(route('product.listing')),
-        });
-    };
-    return (
-       <div className='flex w-full p-20'>
-             <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow-lg">
-            <h1 className="text-2xl font-bold">Edit Product</h1>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) return;
+  
+      const selectedFiles = Array.from(files);
+      if (imageFiles.length + selectedFiles.length > 9) {
+          alert("You can only upload a maximum of 9 images.");
+          return;
+      }
+  
+      setImageFiles((prev) => [...prev, ...selectedFiles]);
+  };
+  
 
-                {/* Other form fields for name, sku, price, stock, fragile, image */}
-                 {/* Name Field */}
-                 <div className="mb-4">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">Product Name</label>
-                    <Input
-                        type="text"
-                        id="name"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        className="mt-1 block w-full"
-                    />
-                    {errors.name && <div className="text-red-500 text-sm">{errors.name}</div>}
-                </div>
-                {/* SKU Field */}
-                <div className="mb-4">
-                    <label htmlFor="sku" className="block text-sm font-medium text-gray-700">SKU</label>
-                    <Input
-                        type="text"
-                        id="sku"
-                        value={data.sku}
-                        onChange={(e) => setData('sku', e.target.value)}
-                        className="mt-1 block w-full"
-                    />
-                    {errors.sku && <div className="text-red-500 text-sm">{errors.sku}</div>}
-                </div>
-                 {/* Description Field */}
-                 <div className="mb-4">
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-                    <Input
-                        type="text"
-                        id="description"
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        className="mt-1 block w-full"
-                    />
-                    {errors.description && <div className="text-red-500 text-sm">{errors.description}</div>}
-                </div>
-                 {/* Price Field */}
-                 <div className="mb-4">
-                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-                    <Input
-                        type="text"
-                        id="price"
-                        value={data.price}
-                        onChange={(e) => setData('price', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.price && <div className="text-red-500 text-sm">{errors.price}</div>}
-                </div>
-                {/* Stock Field */}
-                <div className="mb-4">
-                    <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock</label>
-                    <Input
-                        type="text"
-                        id="stock"
-                        value={data.stock}
-                        onChange={(e) => setData('stock', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.stock && <div className="text-red-500 text-sm">{errors.stock}</div>}
-                </div>
-                 {/* Fragile Field */}
-                <div className="mb-4">
-                    <label htmlFor="fragile" className="block text-sm font-medium text-gray-700">Fragile</label>
-                    <select
-                        id="fragile"
-                        value={data.fragile}
-                        onChange={(e) => setData('fragile', e.target.value)} 
-                        className="mt-1 border rounded p-[6px] block w-full"
-                    >
-                        <option value="no">No</option>
-                        <option value="yes">Yes</option>
-                    </select>
-                    {errors.fragile && <div className="text-red-500 text-sm">{errors.fragile}</div>}
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
-                    <select
-                        id="status"
-                        value={data.status}
-                        onChange={(e) => setData('status', e.target.value)} // Store 'Yes' or 'No' as string
-                        className="mt-1 border rounded p-[6px] block w-full"
-                    >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    {errors.fragile && <div className="text-red-500 text-sm">{errors.fragile}</div>}
-                </div>
-                 {/* width Field */}
-                 <div className="mb-4">
-                    <label htmlFor="width" className="block text-sm font-medium text-gray-700">Width</label>
-                    <Input
-                        type="text"
-                        id="width"
-                        value={data.width}
-                        onChange={(e) => setData('width', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.width && <div className="text-red-500 text-sm">{errors.width}</div>}
-                </div>
-                 {/* weight Field */}
-                 <div className="mb-4">
-                    <label htmlFor="weight" className="block text-sm font-medium text-gray-700">Weight</label>
-                    <Input
-                        type="text"
-                        id="weight"
-                        value={data.weight}
-                        onChange={(e) => setData('weight', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.weight && <div className="text-red-500 text-sm">{errors.weight}</div>}
-                </div>
-                 {/* length Field */}
-                 <div className="mb-4">
-                    <label htmlFor="length" className="block text-sm font-medium text-gray-700">Length</label>
-                    <Input
-                        type="text"
-                        id="length"
-                        value={data.length}
-                        onChange={(e) => setData('length', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.length && <div className="text-red-500 text-sm">{errors.length}</div>}
-                </div>
-                 {/* height Field */}
-                 <div className="mb-4">
-                    <label htmlFor="height" className="block text-sm font-medium text-gray-700">Height</label>
-                    <Input
-                        type="text"
-                        id="height"
-                        value={data.height}
-                        onChange={(e) => setData('height', Number(e.target.value) || 0)} // Convert to number
-                        className="mt-1 block w-full"
-                    />
-                    {errors.height && <div className="text-red-500 text-sm">{errors.height}</div>}
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="category_id" className="block text-sm font-medium text-gray-700">Category</label>
-                    <select
-                        id="category_id"
-                        value={data.category_id}
-                        onChange={(e) => setData('category_id', e.target.value)}
-                        className="mt-1 border rounded p-[6px] block w-full"
-                    >
-                        {categorys.map((category) => (
-                            <option key={category.id} value={category.id.toString()}> {/* ✅ Ensure string value */}
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.category_id && <div className="text-red-500 text-sm">{errors.category_id}</div>}
-                </div>
-{/* Image Preview */}
-{/* <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700">Product Image</label>
-    {data.image && (
-        <img 
-            src={data.image} 
-            alt="Product" 
-            className="w-32 h-32 object-cover rounded mt-2"
-        />
-    )}
-</div> */}
-
-{/* Image Upload */}
-{/* <div className="mb-4">
-    <label htmlFor="image" className="block text-sm font-medium text-gray-700">Change Image</label>
-    <input 
-    type="file" 
-    id="image" 
-    accept="image/*" 
-    onChange={(e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setData('image', file); // ✅ Now stores file properly
-        }
-    }}
-    className="mt-1 block w-full border border-gray-300 rounded"
-/>
-
-    {errors.image && <div className="text-red-500 text-sm">{errors.image}</div>}
-</div> */}
-
-                <Button type="submit" disabled={processing} className="mt-4 bg-blue-500 text-white">
-                    Save Changes
-                </Button>
-            </form>
-        </div>
-       </div>
-    );
+  const handleRemoveImage = (index: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
 };
 
-export default ProductEdit;
+const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  e.preventDefault(); 
+
+
+        
+        //   const formData = new FormData();
+        //   Object.keys(data).forEach((key) => {
+        //       formData.append(key, data[key as keyof typeof data] as string);
+        //   });
+    
+        //   imageFiles.forEach((file, index) => {
+        //       formData.append(`images[${index}]`, file);
+        //   });
+    
+        //   router.post('/store-product', formData, {
+        //       onSuccess: () => {
+        //           reset();
+        //           setImageFiles([]);
+        //           fetchCategories();
+        //       },
+        //       onError: (errors) => {
+        //           console.error("Form submission error:", errors);
+        //       },
+        //   });
+      };
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Product" />
+
+            <div className='flex flex-col w-full items-center gap-4 p-10'>
+                <div className="flex w-full justify-end">
+                  <Button
+                    className="bg-orange-400 p-5 cursor-pointer" 
+                    onClick={() => router.visit("/product-listing")}
+                  >
+                    Back to Product
+                  </Button>
+                </div>
+                <div className="flex flex-col w-full border border-gray-300 rounded-s-sm p-5">
+                    <h2 className="text-xl font-bold mb-4 bg-white">Basic Information</h2>
+                    {/* Product Images */}
+                    <div className="mb-6">
+                      <label className="flex font-medium mb-2 text-gray-700">
+                        Product Images <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-col items-center justify-center border border-dashed border-gray-400 p-6 rounded-lg shadow-sm bg-gray-50 w-full h-40 cursor-pointer"
+                        onClick={() => document.getElementById('fileInput')?.click()}>
+                        {/* Image Preview */}
+                        {imageFiles.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                              {imageFiles.map((file, index) => (
+                                <div key={index} className="relative w-24 h-24">
+                                  <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover rounded-md" />
+                                  <button
+                                      type="button"
+                                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                                      onClick={() => handleRemoveImage(index)}>
+                                        <X size={14} />
+                                  </button>
+                                </div>
+                              ))}
+                          </div>
+                            ) : (
+                            <label className="flex flex-col items-center cursor-pointer">
+                                <svg
+                                    className="w-10 h-10 text-gray-400 mb-2"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 16l4-4 4 4m-4-4v12"></path>
+                                </svg>
+                                <p className="text-gray-500">Drag your files here or click in this area.</p>
+                            </label>
+                            )}
+                            <input
+                              id="fileInput"
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              className="hidden"
+                              onChange={handleUpload}
+                            />
+                      </div>
+                        <p className="text-sm text-gray-500 mt-2">You can upload up to 9 images.</p>
+                    </div>
+                    {/* Form */}
+                    <label className="flex font-medium mb-2">Product Name <span className="text-red-500">*</span></label>
+                    <input
+                        type="text"
+                        value={data.name} 
+                        onChange={(e) => setData('name', e.target.value)}
+                        className="w-full border px-3 py-2 rounded-md mb-4" 
+                        placeholder="Enter product name" 
+                      />
+                    <label className="flex flex-col font-medium mb-2">Description</label>
+                      <textarea
+                          value={data.description}
+                          onChange={(e) => setData('description', e.target.value)}
+                          className="w-full border px-3 py-2 rounded-md mb-4 h-32 resize-none"
+                          placeholder="Enter product description"
+                      />
+
+                      <div className="flex w-full justify-between mb-4">
+                        <label className="flex flex-co items-center font-medium">Category</label>
+                   
+                        <Button
+                          className="bg-orange-400 p-5 justify-end gap-2 cursor-pointer" 
+                          onClick={() => router.visit("/category")}
+                        >
+                        Add Category
+                        </Button>
+                      </div>
+                    <select 
+                        value={data.category_id || ''} 
+                        onChange={(e) => setData('category_id', e.target.value)} 
+                        className="w-full border px-3 py-2 rounded-md"
+                      >
+                        <option value="" disabled>Select a category</option>
+                        {categorys.length > 0 ? categorys.map(category => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
+                        )) : <option disabled>Loading categories...</option>}
+                    </select>
+                    <label className="flex flex-col font-medium mb-2">Sku</label>
+                    <input
+                        type="text"
+                        value={data.sku} 
+                        onChange={(e) => setData('sku', e.target.value)}
+                        className="w-full border px-3 py-2 rounded-md mb-4" 
+                        placeholder="Enter product sku" 
+                      />
+                    <label className="flex flex-col font-medium mb-2">Price</label>
+                    <input
+                        type="text"
+                        value={data.price} 
+                        onChange={(e) => setData('price', Number(e.target.value))}
+                        className="w-full border px-3 py-2 rounded-md mb-4" 
+                        placeholder="Enter product price" 
+                      />
+                    <label className="flex flex-col font-medium mb-2">Stock</label>
+                    <input
+                        type="text"
+                        value={data.stock} 
+                        onChange={(e) => setData('stock', Number(e.target.value))}
+                        className="w-full border px-3 py-2 rounded-md mb-4" 
+                        placeholder="Enter product stock" 
+                      />
+                </div>
+                  {/* Shipping */}
+                <div className="flex flex-col w-full gap-4 border border-gray-300 rounded-s-sm p-5">
+                  <h2 className="text-xl font-bold mb-4 bg-white">Shipping</h2>
+                  <div className="flex flex-col gap-4">
+                    {/* Weight Section */}
+                    <div className="flex items-center gap-2">
+                      <label className="text-black font-medium w-24">Weight</label>
+                      <div className="flex items-center border rounded-md px-2 py-1">
+                        <input 
+                          type="number" 
+                          value={data.weight} 
+                          onChange={(e) => setData('weight', Number(e.target.value))}
+                          placeholder="Weight" 
+                          className="w-20 text-center outline-none" 
+                        />
+                        <span className="text-gray-500 px-2">kg</span>
+                      </div>
+                    </div>
+
+                    {/* Parcel Size Section */}
+                    <div className="flex items-center gap-2">
+                      <label className="text-black font-medium w-24">Parcel Size</label>
+                      {/* Width */}
+                      <div className="flex items-center border rounded-md px-2 py-1">
+                        <input
+                          type="number"
+                          value={data.width}
+                          onChange={(e) => setData('width', Number(e.target.value))}
+
+                        
+                          placeholder="Enter product width"
+                        />
+                          <span className="text-gray-500 px-2">cm</span>
+                      </div>
+                      <span className="text-gray-500">×</span>
+                      {/* Length */}
+                      <div className="flex items-center border rounded-md px-2 py-1">
+                        <input
+                          type="number"
+                          value={data.length}
+                          onChange={(e) => setData('length', Number(e.target.value))}
+
+                          placeholder="Enter product length"
+                          />
+                          <span className="text-gray-500 px-2">cm</span>
+                      </div>
+                      <span className="text-gray-500">×</span>
+                      {/* Height */}
+                      <div className="flex items-center border rounded-md px-2 py-1">
+                        <input
+                          type="number"
+                          value={data.height}
+                          onChange={(e) => setData('height', Number(e.target.value))}
+
+                          placeholder="Enter product height"
+                          />
+                          <span className="text-gray-500 px-2">cm</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {/* Fragile Label */}
+                    <label className="flex font-medium mb-2">Fragile?</label>
+                    <div className="flex gap-4">
+                      <label className={`flex items-center gap-2 px-5 py-2 rounded-full cursor-pointer border
+                          ${data.fragile === "yes" ? "bg-red-500 text-white border-red-500" : "bg-white border-gray-300 hover:bg-red-100"}`}>
+                          <input type="radio" value="yes" checked={data.fragile === "yes"}
+                              onChange={(e) => setData("fragile", e.target.value)} className="hidden" />
+                          <XCircle className={`w-5 h-5 ${data.fragile === "yes" ? "text-white" : "text-red-500"}`} />
+                          <span>Yes</span>
+                      </label>
+                      <label className={`flex items-center gap-2 px-5 py-2 rounded-full cursor-pointer border
+                          ${data.fragile === "no" ? "bg-green-500 text-white border-green-500" : "bg-white border-gray-300 hover:bg-green-100"}`}>
+                          <input type="radio" value="no" checked={data.fragile === "no"}
+                              onChange={(e) => setData("fragile", e.target.value)} className="hidden" />
+                          <CheckCircle className={`w-5 h-5 ${data.fragile === "no" ? "text-white" : "text-green-500"}`} />
+                          <span>No</span>
+                      </label>
+                    </div>
+                  </div>
+                 {/* Status */}
+                  <label className="flex font-medium mb-2">Status</label>
+                  <select 
+                        value={data.status} 
+                        onChange={(e) => setData('status', e.target.value)} 
+                        className="w-full border px-3 py-2 rounded-md mb-4">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                  </select>         
+                </div>
+                <button onClick={handleSubmit} className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md">Submit</button>
+            </div>
+        </AppLayout>
+    )
+}
+

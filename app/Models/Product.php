@@ -27,8 +27,13 @@ class Product extends Model implements HasMedia
         'status',
        
     ];
-    // public function category()
-    // {
-    //     return $this->belongsTo(Category::class);
-    // }
+    public function getImageUrlAttribute()
+    {
+        return $this->getFirstMediaUrl('product_images') ?: null; 
+    }
+
+    public function categories(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->BelongsTo(Category::class, 'category_id', 'id');
+    }
 }

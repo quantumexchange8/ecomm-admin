@@ -10,45 +10,56 @@ use Inertia\Inertia;
 
 class ProductEditController extends Controller
 {
-    // Method to show the edit form with the current product data and categories
     public function edit($id)
     {
-        $product = Product::find($id); // Fetch the product by ID
-        $categorys = Category::all(); // Fetch all categories
+        
+        $product = Product::with(['media', 'categories'])->find($id);
+
+        // Get all images from the "product_images" media collection
+        // $images = $product->getMedia('product_images')->map(function ($media) {
+        //     return $media->getUrl(); // Get full image URL
+        // });
+
+        // $productData = $product->toArray();
+        // $productData['images'] = $images; // Attach image URLs
 
         return Inertia::render('Product/ProductEdit', [
             'product' => $product,
-            'categorys' => $categorys, // Pass the categories to the front-end
         ]);
     }
+
     
-    // Method to handle the update of the product
-    public function update(Request $request, $id)
-    {
-        $product = Product::find($id);
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'sku' => 'required|string',
-            'price' => 'required|numeric',
-            'stock' => 'required|integer',
-            'fragile' => 'required|string',
-            'category_id' => 'required|integer',
-           'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'weight' => 'required|numeric|min:0',
-            'width' => 'required|numeric|min:0',
-            'length' => 'required|numeric|min:0',
-            'height' => 'required|numeric|min:0',
-            'fragile' => 'required|string',
-            'status' => 'required|string',
+public function update(Request $request, $id)
+{
+    dd($request->all());
+    $product = Product::findOrFail($id); // Ensures product exists
 
-        ]);
+    $validated = $request->validate([
+        'name' => 'sometimes|string',
+        'sku' => 'sometimes|string',
+        'price' => 'sometimes|numeric',
+        'stock' => 'sometimes|integer',
+        'fragile' => 'sometimes|string',
+        'category_id' => 'sometimes|integer',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'weight' => 'sometimes|numeric|min:0',
+        'width' => 'sometimes|numeric|min:0',
+        'length' => 'sometimes|numeric|min:0',
+        'height' => 'sometimes|numeric|min:0',
+        'status' => 'sometimes|string',
+    ]);
 
-        // Find the product by ID and update it
-        $product = Product::find($id);
-        $product->update($validated);
+    $product->update($validated);
 
-        return redirect()->route('product.listing')->with('success', 'Product updated successfully!');
+    if ($request->hasFile('image')) {
+        $product->clearMediaCollection('product_images'); 
+        $product->addMedia($request->file('image'))->toMediaCollection('product_images');
+
     }
+
+    return redirect()->route('product.listing')->with('success', 'Product updated successfully!');
+}
+
 }
 
 

@@ -65,49 +65,24 @@ class ProductController extends Controller
         return response()->json($categorys);
     }
 
-    public function edit($id)
-    {
-        $product = Product::find($id);
+    // public function edit($id)
+    // {
+    //     $product = Product::find($id);
       
         
-        $categorys = Category::all();
+    //     $categorys = Category::all();
     
-        return Inertia::render('Product/ProductEdit', [
-            'product' => $product,
-            'categorys' => $categorys
-        ]);
-    }
+    //     return Inertia::render('Product/ProductEdit', [
+    //         'product' => $product,
+    //         'categorys' => $categorys
+    //     ]);
+    // }
     
     
 
-    public function update(Request $request, $id)
-    {
-        $product = Product::find($id);
-    
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:50',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-    
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products');
-            $validatedData['image'] = $imagePath;
-        }
-    
-        $product->update($validatedData);
-    
-        return response()->json(['message' => 'Product updated successfully']);
-    }
-    
-    
     // public function update(Request $request, $id)
     // {
-    //     $product = Product::findOrFail($id);
+    //     $product = Product::find($id);
     
     //     $validatedData = $request->validate([
     //         'name' => 'required|string|max:255',
@@ -115,38 +90,20 @@ class ProductController extends Controller
     //         'description' => 'nullable|string',
     //         'price' => 'required|numeric|min:0',
     //         'stock' => 'required|integer|min:0',
-    //         'fragile' => 'required|string|in:yes,no',
-    //         'weight' => 'required|numeric|min:0',
-    //         'width' => 'required|numeric|min:0',
-    //         'length' => 'required|numeric|min:0',
-    //         'height' => 'required|numeric|min:0',
-    //         'category_id' => 'required|exists:categorys,id', // Ensure category exists
-    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Validate image
+    //         'category_id' => 'required|exists:categories,id',
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     //     ]);
     
-    //     // Handle Image Upload
     //     if ($request->hasFile('image')) {
-    //         // Delete old image if it exists
-    //         if ($product->image) {
-    //             Storage::delete($product->image);
-    //         }
-    
-    //         // Store new image and save path
-    //         $validatedData['image'] = $request->file('image')->store('products');
+    //         $imagePath = $request->file('image')->store('products');
+    //         $validatedData['image'] = $imagePath;
     //     }
     
     //     $product->update($validatedData);
     
-    //     return redirect()->back()->with('success', 'Product updated successfully');
+    //     return response()->json(['message' => 'Product updated successfully']);
     // }
     
-    
-    // public function index()
-    // {
-    //     $products = Product::with('categorys')->latest()->get();
-    //     return response()->json($products);
-    // }
-
     public function index()
     {
        $products = Product::with('media', 'category')->get();

@@ -24,7 +24,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/categorys', [ProductController::class, 'getCategories']);
     Route::get('/getCategory', [ProductController::class, 'getCategory'])->name('getCategory');
     Route::get('/index', [ProductController::class, 'index'])->name('index');
-
+    Route::post('/store-product', [ProductController::class, 'storeProduct'])->name('store-product');
     Route::delete('/deleteProduct/{id}', [ProductController::class, 'deleteProduct']);
     Route::get('/show', [ProductController::class, 'show']);
     Route::delete('/destroy', [ProductController::class, 'destroy']);
