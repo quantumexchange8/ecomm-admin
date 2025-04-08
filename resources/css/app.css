@@ -9,7 +9,7 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -157,3 +157,158 @@
         @apply bg-background text-foreground;
     }
 }
+
+.p-steps ol {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.p-steps .p-steps-item .p-menuitem-link .p-steps-number {
+    border: 1px solid #f3f4f6;
+    min-width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    font-size: 14px;
+    border-radius: 50%;
+}
+
+.p-steps .p-steps-item.p-highlight .p-steps-number {
+    background: #171717;
+    color: #FFF;
+}
+
+.p-steps-title {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.p-inputnumber-input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5dc;
+    border-radius: 6px;
+}
+
+.p-dropdown {
+    background: #ffffff;
+    border: 1px solid #E4E4E7;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    border-radius: 6px;
+    box-shadow: 0px 1px 2px 0px rgba(9, 9, 11, 0.05);
+    padding: 8px 12px;
+  }
+  .p-dropdown:not(.p-disabled):hover {
+    border-color: #f3f4f6;
+  }
+  .p-dropdown:not(.p-disabled).p-focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2rem #ffffff;
+    border-color: #f3f4f6;
+  }
+  .p-dropdown.p-dropdown-clearable .p-dropdown-label {
+    padding-right: 1.75rem;
+  }
+  .p-dropdown .p-dropdown-label {
+    background: transparent;
+    border: 0 none;
+  }
+  .p-dropdown .p-dropdown-label.p-placeholder {
+    color: #A1A1AA;
+  }
+  .p-dropdown .p-dropdown-label:enabled:focus {
+    outline: 0 none;
+    box-shadow: none;
+  }
+  .p-dropdown .p-dropdown-trigger {
+    background: #FFFFFF;
+    color: #6c757d;
+    width: 20px;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+  .p-dropdown .p-dropdown-clear-icon {
+    color: #6c757d;
+    right: 3rem;
+  }
+  .p-dropdown.p-invalid.p-component {
+    border-color: #e24c4c;
+  }
+  
+  .p-dropdown-panel {
+    background: #ffffff;
+    color: #495057;
+    border: 0 none;
+    border-radius: 6px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  }
+  .p-dropdown-panel .p-dropdown-header {
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid #dee2e6;
+    color: #343a40;
+    background: #f8f9fa;
+    margin: 0;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+  }
+  .p-dropdown-panel .p-dropdown-header .p-dropdown-filter {
+    padding-right: 1.75rem;
+    margin-right: -1.75rem;
+  }
+  .p-dropdown-panel .p-dropdown-header .p-dropdown-filter-icon {
+    right: 0.75rem;
+    color: #6c757d;
+  }
+  .p-dropdown-panel .p-dropdown-header .p-dropdown-clearable-filter .p-dropdown-filter {
+    padding-right: 3.5rem;
+    margin-right: -3.5rem;
+  }
+  .p-dropdown-panel .p-dropdown-header .p-dropdown-clearable-filter .p-dropdown-filter-clear-icon {
+    right: 2.5rem;
+  }
+  .p-dropdown-panel .p-dropdown-items {
+    padding: 0.75rem 0;
+  }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    margin: 0;
+    padding: 0.75rem 16px;
+    border: 0 none;
+    color: #495057;
+    background: transparent;
+    transition: box-shadow 0.2s;
+    border-radius: 0;
+  }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+    color: #171717;
+    background: #EFF6FF;
+  }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item:not(.p-highlight):not(.p-disabled):hover {
+    color: #495057;
+    background: #e9ecef;
+  }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group {
+    margin: 0;
+    padding: 0.75rem 1.25rem;
+    color: #343a40;
+    background: #ffffff;
+    font-weight: 700;
+  }
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-empty-message {
+    padding: 0.75rem 1.25rem;
+    color: #495057;
+    background: transparent;
+  }
+  
+  .p-input-filled .p-dropdown {
+    background: #e9ecef;
+  }
+  .p-input-filled .p-dropdown:not(.p-disabled):hover {
+    background-color: #e9ecef;
+  }
+  .p-input-filled .p-dropdown:not(.p-disabled).p-focus {
+    background-color: #ffffff;
+  }
+  .p-input-filled .p-dropdown:not(.p-disabled).p-focus .p-inputtext {
+    background-color: transparent;
+  }
+

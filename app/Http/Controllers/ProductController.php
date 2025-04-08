@@ -9,56 +9,63 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function product()
+    public function createProduct()
     {
         return Inertia::render('Product/Product');
     }
    
-   
+    public function editProduct($id)
+    {
+
+        $product = Product::find($id);
+
+        return Inertia::render('Product/EditProduct', [
+            'product' => $product,
+        ]);
+    }
     
     public function storeProduct(Request $request)
-{//dd($request->all());
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'sku' => 'required|string',
-        'price' => 'required|numeric|min:0',
-        'stock' => 'required|integer|min:0',
-        'category_id' => 'required|exists:categorys,id', // Fixed table name
-        'weight' => 'required|numeric|min:0',
-        'width' => 'required|numeric|min:0',
-        'length' => 'required|numeric|min:0',
-        'height' => 'required|numeric|min:0',
-        'fragile' => 'required|string',
-        'status' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+    {
+        //dd($request->all());
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'sku' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categorys,id', // Fixed table name
+            'weight' => 'required|numeric|min:0',
+            'width' => 'required|numeric|min:0',
+            'length' => 'required|numeric|min:0',
+            'height' => 'required|numeric|min:0',
+            'fragile' => 'required|string',
+            'status' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    // Create a new product
-    $product = Product::create([
-        'name' => $request->name,
-        'sku' => $request->sku,
-        'description' => $request->description,
-        'price' => $request->price,
-        'stock' => $request->stock,
-        'category_id' => $request->category_id,
-        'weight' => $request->weight,
-        'width' => $request->width,
-        'length' => $request->length,
-        'height' => $request->height,
-        'fragile' => $request->fragile,
-        'status' => 'Active',
-    ]);
+        // Create a new product
+        $product = Product::create([
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'category_id' => $request->category_id,
+            'weight' => $request->weight,
+            'width' => $request->width,
+            'length' => $request->length,
+            'height' => $request->height,
+            'fragile' => $request->fragile,
+            'status' => 'Active',
+        ]);
 
-    // Handle image upload using Spatie Media Library
-    foreach($request->images as $image){
-        if ($image) {
-            $product->addMedia($image)->toMediaCollection('product_images');
+        // Handle image upload using Spatie Media Library
+        foreach($request->images as $image){
+            if ($image) {
+                $product->addMedia($image)->toMediaCollection('product_images');
+            }
+        }
     }
     
-    }
-
-   
-}
     public function getCategory()
     {
         $categorys = Category::select('id', 'name')->get();
@@ -162,5 +169,35 @@ class ProductController extends Controller
 
     //     return redirect()->back()->with('success', 'Product deleted successfully.');
     // }
+
+    public function updateProduct(Request $request)
+    {
+        
+        $product = Product::find($request->id);
+
+        $product->update([
+            'name' => $request->name,
+            'sku' => $request->sku,
+            'description' => $request->description,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'category_id' => $request->category_id['id'],
+            'weight' => $request->weight,
+            'width' => $request->width,
+            'length' => $request->length,
+            'height' => $request->height,
+            'fragile' => $request->fragile,
+            'status' => $request->status,
+        ]);
+
+        if ($request->hasFile('product_image')) {
+            $product->clearMediaCollection('product_images');
+            foreach ($request->product_image as $image) {
+                $product->addMedia($image)->toMediaCollection('product_images');
+            }
+        }
+
+        return redirect()->back();
+    }
 }
 

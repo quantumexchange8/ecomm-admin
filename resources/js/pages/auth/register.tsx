@@ -17,6 +17,7 @@ type RegisterForm = {
 };
 
 export default function Register() {
+    
     const { data, setData, post, processing, errors, reset } = useForm<Required<RegisterForm>>({
         name: '',
         email: '',

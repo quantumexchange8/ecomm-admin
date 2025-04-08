@@ -31,7 +31,7 @@ const AppSidebar = ({ product }: AppSidebarProps) => {
         },
         {
             title: 'Product',
-            url: 'product',
+            url: 'create-product',
             icon: ShoppingBag,
         },
         {

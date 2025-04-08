@@ -69,7 +69,7 @@ export default function Product() {
         }
         setImageFiles((prev) => [...prev, ...selectedFiles]);
     }
-};
+  };
 
   const handleRemoveImage = (index: number) => {
       setImageFiles((prev) => prev.filter((_, i) => i !== index));
