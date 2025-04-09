@@ -1,10 +1,7 @@
 <?php
-// ProductEditController.php
-
 namespace App\Http\Controllers;
-
 use App\Models\Product;
-use App\Models\Category; // Import the Category model
+use App\Models\Category; 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,15 +11,6 @@ class ProductEditController extends Controller
     {
         
         $product = Product::with(['media', 'categories'])->find($id);
-
-        // Get all images from the "product_images" media collection
-        // $images = $product->getMedia('product_images')->map(function ($media) {
-        //     return $media->getUrl(); // Get full image URL
-        // });
-
-        // $productData = $product->toArray();
-        // $productData['images'] = $images; // Attach image URLs
-
         return Inertia::render('Product/ProductEdit', [
             'product' => $product,
         ]);
@@ -32,7 +20,7 @@ class ProductEditController extends Controller
 public function update(Request $request, $id)
 {
     dd($request->all());
-    $product = Product::findOrFail($id); // Ensures product exists
+    $product = Product::find($id);
 
     $validated = $request->validate([
         'name' => 'sometimes|string',

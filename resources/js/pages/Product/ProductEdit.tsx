@@ -44,13 +44,6 @@ export default function ProductEdit({ product }: { product: Product }) {
             const response = await axios.get("/getCategory");
     
             setCategorys(response.data);
-            
-            // if (Array.isArray(response.data)) {  
-            //     setCategorys(response.data);
-            //     if (response.data.length > 0) setSelectedCategory(response.data[0].id);
-            // } else {
-            //     console.error("Invalid category response:", response.data);
-            // }
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
@@ -67,7 +60,7 @@ export default function ProductEdit({ product }: { product: Product }) {
         price: product.price,
         stock: product.stock,
         fragile: product.fragile,
-        category_id: String(product.category_id), // Ensure it's stored as a string
+        category_id: String(product.category_id),
         image: product.image, 
         status: product.status,
         description: product.description,
@@ -98,27 +91,6 @@ export default function ProductEdit({ product }: { product: Product }) {
 const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
   e.preventDefault(); 
 
-
-        
-        //   const formData = new FormData();
-        //   Object.keys(data).forEach((key) => {
-        //       formData.append(key, data[key as keyof typeof data] as string);
-        //   });
-    
-        //   imageFiles.forEach((file, index) => {
-        //       formData.append(`images[${index}]`, file);
-        //   });
-    
-        //   router.post('/store-product', formData, {
-        //       onSuccess: () => {
-        //           reset();
-        //           setImageFiles([]);
-        //           fetchCategories();
-        //       },
-        //       onError: (errors) => {
-        //           console.error("Form submission error:", errors);
-        //       },
-        //   });
       };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
