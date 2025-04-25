@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('warehouses', function (Blueprint $table) {
             $table->id();
-            $table->integer('product_id');
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->string('product_name');
             $table->integer('stock_available');
             $table->string('status'); //out of stock/low stock/in stock
